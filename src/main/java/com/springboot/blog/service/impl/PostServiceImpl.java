@@ -1,16 +1,19 @@
 package com.springboot.blog.service.impl;
 
 import com.springboot.blog.dto.PostDto;
+import com.springboot.blog.dto.PostResponse;
 import com.springboot.blog.entity.Post;
 import com.springboot.blog.exception.ResourceNotFoundException;
 import com.springboot.blog.repository.PostRepository;
 import com.springboot.blog.service.PostService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Pageable;
 
-import javax.swing.text.html.parser.Entity;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PostServiceImpl implements PostService {
@@ -35,13 +38,24 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostDto> getAllPosts() {
-        List<Post> posts= postRepository.findAll();
+    public PostResponse getAllPosts(int pageNo , int pageSize , String sortBy, String sortDir) {
+
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+
+        // Pagination : Create Pageable instance
+        Pageable pageable = (Pageable) PageRequest.of(pageNo,pageSize,sort);
+
+        Page<Post> posts= postRepository.findAll(pageable);
+
+        // Get Content for page object.
+        List<Post> listOfPost= posts.getContent();
+
         List<PostDto> postDtoList = new ArrayList<>();
-        for(Post post : posts) {
+        for(Post post : listOfPost) {
             postDtoList.add(mapEntityToDTO(post));
         }
-        return postDtoList;
+
+        return getPostResponse(postDtoList, posts);
     }
 
     @Override
@@ -83,6 +97,16 @@ public class PostServiceImpl implements PostService {
         post.setDescription(postDto.getDescription());
         post.setContent(postDto.getContent());
         return post;
+    }
+    private PostResponse getPostResponse(List<PostDto> postDtoList, Page<Post> posts) {
+        PostResponse postResponse = new PostResponse();
+        postResponse.setContent(postDtoList);
+        postResponse.setPageNo(posts.getNumber());
+        postResponse.setPageSize(posts.getSize());
+        postResponse.setTotalPages(posts.getTotalPages());
+        postResponse.setTotalElements(posts.getTotalElements());
+        postResponse.setLast(posts.isLast());
+        return postResponse;
     }
 }
 
