@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Data // Lambok :  will set setter and getter , hascode , toString at runtime.
 @AllArgsConstructor // Generate all-args constructor.
 @NoArgsConstructor // when we create a JPA Entity with an argument constructor then which should also need a no argument. constructor , because Hibernate internally use proxies to create objects.
@@ -29,4 +32,6 @@ public class Post {
     @Column(name = "content" , nullable = false)
     private String content;
 
+    @OneToMany(mappedBy = "post" , cascade = CascadeType.ALL , orphanRemoval = true) // @OneToMany annotation in a JPA entity does not directly create a field in the database. Instead, it represents a relationship between two entities.
+    private Set<Comment> comments = new HashSet<>();
 }
