@@ -4,6 +4,7 @@ import com.springboot.blog.dto.PostDto;
 import com.springboot.blog.dto.PostResponse;
 import com.springboot.blog.service.PostService;
 import com.springboot.blog.utils.AppConstants;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +17,8 @@ import java.util.List;
 @RequestMapping("/api")
 public class PostController {
     private PostService postService;
-
     @Autowired // NOTE 1
-    public PostController(PostService postService) {
+    public PostController(PostService postService, ModelMapper modelMapper) {
         this.postService = postService;
     }
 

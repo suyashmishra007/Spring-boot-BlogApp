@@ -6,6 +6,7 @@ import com.springboot.blog.entity.Post;
 import com.springboot.blog.exception.ResourceNotFoundException;
 import com.springboot.blog.repository.PostRepository;
 import com.springboot.blog.service.PostService;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -21,8 +22,10 @@ public class PostServiceImpl implements PostService {
     // TODO: Study Dependency Injection
     //    @Autowired => NOTE 1
     private PostRepository postRepository;
-    public PostServiceImpl(PostRepository postRepository) {
+    private ModelMapper modelMapper;
+    public PostServiceImpl(PostRepository postRepository, ModelMapper modelMapper) {
         this.postRepository = postRepository;
+        this.modelMapper = modelMapper;
     }
 
     @Override
@@ -83,19 +86,21 @@ public class PostServiceImpl implements PostService {
 
     // Convert Entity to DTO.
     private PostDto mapEntityToDTO(Post post){
-        PostDto postDto = new PostDto();
-        postDto.setId(post.getId());
-        postDto.setTitle(post.getTitle());
-        postDto.setDescription(post.getDescription());
-        postDto.setContent(post.getContent());
+        PostDto postDto = modelMapper.map(post,PostDto.class);
+//        PostDto postDto = new PostDto();
+//        postDto.setId(post.getId());
+//        postDto.setTitle(post.getTitle());
+//        postDto.setDescription(post.getDescription());
+//        postDto.setContent(post.getContent());
         return postDto;
     }
     // Convert Entity to DTO.
     private Post mapDTOtoEntity(PostDto postDto){
-        Post post = new Post();
-        post.setTitle(postDto.getTitle());
-        post.setDescription(postDto.getDescription());
-        post.setContent(postDto.getContent());
+        Post post = modelMapper.map(postDto,Post.class);
+//        Post post = new Post();
+//        post.setTitle(postDto.getTitle());
+//        post.setDescription(postDto.getDescription());
+//        post.setContent(postDto.getContent());
         return post;
     }
     private PostResponse getPostResponse(List<PostDto> postDtoList, Page<Post> posts) {
