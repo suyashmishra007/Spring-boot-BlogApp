@@ -1,14 +1,14 @@
 package com.springboot.blog.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
 
-@Data // Lambok :  will set setter and getter , hascode , toString at runtime.
+//@Data // Lambok :  will set setter and getter , hascode , toString at runtime.
+@Getter
+@Setter
 @AllArgsConstructor // Generate all-args constructor.
 @NoArgsConstructor // when we create a JPA Entity with an argument constructor then which should also need a no argument. constructor , because Hibernate internally use proxies to create objects.
 @Entity
