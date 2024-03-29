@@ -26,7 +26,6 @@ public class PostController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/post")
-    @Transactional
     public ResponseEntity<PostDto>  createPost(@Valid @RequestBody PostDto postDto) { // NOTE 2 ;
         return new ResponseEntity<>(postService.createPost(postDto), HttpStatus.CREATED);
     }
