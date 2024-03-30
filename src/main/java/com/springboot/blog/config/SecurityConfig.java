@@ -1,5 +1,7 @@
 package com.springboot.blog.config;
 
+import com.springboot.blog.security.JwtAuthenticationEntryPoint;
+import com.springboot.blog.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -8,10 +10,12 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 // this class become java based configuration , and within this java based configuration, we can define all the spring bean definations,// This annotation marks the class as a Java-based configuration for the Spring application. It means that this class will contain configuration settings for the application.
@@ -20,9 +24,16 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private UserDetailsService userDetailsService;
+    private JwtAuthenticationEntryPoint authenticationEntryPoint;
 
-    public SecurityConfig(UserDetailsService userDetailsService) {
+    private JwtAuthenticationFilter authenticationFilter;
+
+    public SecurityConfig(UserDetailsService userDetailsService,
+                          JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
+                          JwtAuthenticationFilter authenticationFilter) {
         this.userDetailsService = userDetailsService;
+        this.authenticationEntryPoint = jwtAuthenticationEntryPoint;
+        this.authenticationFilter = authenticationFilter;
     }
 
     @Bean
@@ -33,8 +44,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize ->
                         authorize.requestMatchers(HttpMethod.GET, "/api/**").permitAll()
                                 .requestMatchers("/api/auth/**").permitAll()
-                )
-                .httpBasic(Customizer.withDefaults());
+                                .anyRequest().authenticated()
+                ).exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+        http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
