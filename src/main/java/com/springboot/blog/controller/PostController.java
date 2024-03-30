@@ -9,10 +9,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -23,9 +22,9 @@ public class PostController {
         this.postService = postService;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/post")
-    @Transactional
-    public ResponseEntity<PostDto>  createPost(@Valid @RequestBody PostDto postDto) { // NOTE 2 ;
+    public ResponseEntity<PostDto> createPost(@Valid @RequestBody PostDto postDto) { // NOTE 2 ;
         return new ResponseEntity<>(postService.createPost(postDto), HttpStatus.CREATED);
     }
 
@@ -44,11 +43,13 @@ public class PostController {
         return ResponseEntity.ok(postService.getPostById(id));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/post/{id}")
     public ResponseEntity<PostDto> updatePost(@Valid @RequestBody PostDto postDto, @PathVariable(name = "id") long id) {
         return ResponseEntity.ok(postService.updatePostById(postDto,id));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/post/{id}")
     public ResponseEntity<String> deletePost(@PathVariable(name = "id") long id){
         return new ResponseEntity<>(postService.deletePostById(id),HttpStatus.OK);
