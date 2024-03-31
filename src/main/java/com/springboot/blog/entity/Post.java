@@ -34,4 +34,11 @@ public class Post {
 
     @OneToMany(mappedBy = "post" , cascade = CascadeType.ALL , orphanRemoval = true) // @OneToMany annotation in a JPA entity does not directly create a field in the database. Instead, it represents a relationship between two entities.
     private Set<Comment> comments = new HashSet<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
 }
+/*
+in one-to-many mapping , we have to create a foreign key in a child table.
+ */
